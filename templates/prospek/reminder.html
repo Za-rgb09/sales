@@ -1,0 +1,620 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+    /* Variabel Tema Cybertron Beacon */
+    .cyber-reminder-wrapper {
+        --cb-primary: #ef233c;      /* Autobot Red */
+        --cb-secondary: #00b4d8;    /* Energon Cyan */
+        --cb-gold: #ffb703;         /* Bumblebee Gold */
+        --cb-green: #00ffcc;        /* Matrix Green */
+        --cb-bg-dark: #070a10;
+        --cb-panel: #0e131f;
+        --cb-row-hover: rgba(0, 180, 216, 0.12);
+        --cb-border: rgba(0, 180, 216, 0.28);
+        --cb-glow-red: rgba(239, 35, 60, 0.45);
+        --cb-glow-cyan: rgba(0, 180, 216, 0.35);
+        --cb-glow-gold: rgba(255, 183, 3, 0.4);
+        --cb-glow-green: rgba(0, 255, 204, 0.4);
+
+        background-color: var(--cb-bg-dark);
+        background-image: 
+            linear-gradient(rgba(0, 180, 216, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 180, 216, 0.04) 1px, transparent 1px);
+        background-size: 32px 32px;
+        color: #f1f5f9;
+        font-family: 'Rajdhani', sans-serif;
+        min-height: 85vh;
+        border-radius: 6px;
+        border: 1px solid var(--cb-border);
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85);
+    }
+
+    /* Header Section */
+    .cyber-beacon-header {
+        background: linear-gradient(90deg, rgba(14, 19, 31, 0.95), rgba(255, 183, 3, 0.12));
+        border-left: 5px solid var(--cb-gold);
+        border-bottom: 1px solid var(--cb-border);
+        padding: 20px 26px;
+        margin-bottom: 24px;
+        clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+    }
+
+    .cyber-tag {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--cb-gold);
+        letter-spacing: 2px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .cyber-beacon-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        font-size: 1.7rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0;
+        color: #ffffff;
+        text-shadow: 0 0 14px var(--cb-glow-gold);
+    }
+
+    .cyber-beacon-header p {
+        margin: 4px 0 0;
+        color: #94a3b8;
+        font-size: 1.05rem;
+    }
+
+    /* Alert Messages Django */
+    .cyber-alert-msg {
+        background: rgba(0, 255, 204, 0.1);
+        border: 1px solid var(--cb-green);
+        border-left: 4px solid var(--cb-green);
+        color: var(--cb-green);
+        font-family: 'Share Tech Mono', monospace;
+        padding: 12px 20px;
+        margin-bottom: 24px;
+        letter-spacing: 1px;
+        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+
+    /* 3 Kartu Statistik Atas */
+    .cyber-stat-card {
+        background: var(--cb-panel);
+        border: 1px solid var(--cb-border);
+        border-top: 3px solid var(--cb-secondary);
+        padding: 22px 24px;
+        position: relative;
+        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.55);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .cyber-stat-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .cyber-stat-card.stat-cyan { border-top-color: var(--cb-secondary); }
+    .cyber-stat-card.stat-gold { border-top-color: var(--cb-gold); }
+    .cyber-stat-card.stat-red  { border-top-color: var(--cb-primary); }
+
+    .stat-code {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.78rem;
+        color: #94a3b8;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .stat-number {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.1rem;
+        font-weight: 900;
+        margin: 0;
+        color: #ffffff;
+    }
+
+    .stat-cyan .stat-number { color: var(--cb-secondary); text-shadow: 0 0 14px var(--cb-glow-cyan); }
+    .stat-gold .stat-number { color: var(--cb-gold); text-shadow: 0 0 14px var(--cb-glow-gold); }
+    .stat-red .stat-number  { color: #ff4d6d; text-shadow: 0 0 14px var(--cb-glow-red); }
+
+    /* Panel Tabel Daftar Pengingat */
+    .cyber-table-card {
+        background: var(--cb-panel);
+        border: 1px solid var(--cb-border);
+        border-top: 3px solid var(--cb-gold);
+        clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+    }
+
+    .cyber-card-topbar {
+        background: rgba(255, 183, 3, 0.08);
+        padding: 12px 22px;
+        border-bottom: 1px solid var(--cb-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cyber-card-topbar h5 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.92rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin: 0;
+        color: #ffffff;
+    }
+
+    .cyber-card-topbar span {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--cb-gold);
+    }
+
+    /* Tabel Cybertron */
+    .cyber-table {
+        width: 100%;
+        margin-bottom: 0;
+        color: #e2e8f0;
+        border-collapse: collapse;
+    }
+
+    .cyber-table thead th {
+        background: rgba(5, 8, 15, 0.9);
+        color: var(--cb-secondary);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 16px 20px;
+        border-bottom: 2px solid var(--cb-gold);
+        white-space: nowrap;
+    }
+
+    .cyber-table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        transition: background 0.2s ease;
+    }
+
+    .cyber-table tbody tr:hover {
+        background: var(--cb-row-hover);
+    }
+
+    .cyber-table tbody td {
+        padding: 15px 20px;
+        font-size: 1.02rem;
+        vertical-align: middle;
+    }
+
+    .cyber-customer-link {
+        font-weight: 700;
+        color: var(--cb-secondary);
+        text-decoration: none;
+        letter-spacing: 0.5px;
+        transition: 0.2s;
+    }
+
+    .cyber-customer-link:hover {
+        color: #ffffff;
+        text-shadow: 0 0 10px var(--cb-glow-cyan);
+    }
+
+    .cyber-mono {
+        font-family: 'Share Tech Mono', monospace;
+        color: #cbd5e1;
+        font-size: 0.95rem;
+    }
+
+    /* Badge Status */
+    .cyber-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.78rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+    }
+
+    .badge-overdue {
+        background: rgba(239, 35, 60, 0.18);
+        color: #ff4d6d;
+        border: 1px solid var(--cb-primary);
+        animation: pulseWarn 1.5s infinite;
+    }
+
+    .badge-pending {
+        background: rgba(255, 183, 3, 0.15);
+        color: var(--cb-gold);
+        border: 1px solid var(--cb-gold);
+    }
+
+    /* Tombol Selesaikan */
+    .btn-cyber-complete {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 8px 16px;
+        background: rgba(0, 255, 204, 0.14);
+        color: var(--cb-green);
+        border: 1px solid var(--cb-green);
+        cursor: pointer;
+        clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+        transition: all 0.25s ease;
+    }
+
+    .btn-cyber-complete:hover {
+        background: var(--cb-green);
+        color: #05070a;
+        box-shadow: 0 0 16px var(--cb-glow-green);
+    }
+
+    .cyber-empty {
+        font-family: 'Share Tech Mono', monospace;
+        color: var(--cb-secondary);
+        letter-spacing: 1.5px;
+        padding: 40px 20px !important;
+        font-size: 1rem;
+    }
+
+    /* ================= POP-UP MODAL CYBERTRON ================= */
+    .cyber-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(3, 5, 9, 0.85);
+        backdrop-filter: blur(6px);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        padding: 20px;
+        animation: fadeInModal 0.25s ease;
+    }
+
+    .cyber-modal-overlay.show {
+        display: flex;
+    }
+
+    .cyber-modal-box {
+        width: 100%;
+        max-width: 500px;
+        background: #0d121d;
+        border: 1px solid var(--cb-gold);
+        border-top: 4px solid var(--cb-gold);
+        box-shadow: 0 0 40px rgba(255, 183, 3, 0.35);
+        clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+        overflow: hidden;
+        transform: scale(0.95);
+        animation: popScale 0.25s forwards;
+    }
+
+    .cyber-modal-box.modal-green {
+        border-color: var(--cb-green);
+        border-top-color: var(--cb-green);
+        box-shadow: 0 0 40px rgba(0, 255, 204, 0.35);
+    }
+
+    .cyber-modal-head {
+        background: rgba(255, 183, 3, 0.12);
+        padding: 12px 22px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.8rem;
+        color: var(--cb-gold);
+        letter-spacing: 1.5px;
+    }
+
+    .modal-green .cyber-modal-head {
+        background: rgba(0, 255, 204, 0.12);
+        color: var(--cb-green);
+    }
+
+    .cyber-modal-body {
+        padding: 28px 26px;
+        text-align: center;
+    }
+
+    .cyber-modal-body h4 {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        font-size: 1.35rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #ffffff;
+        margin-bottom: 12px;
+    }
+
+    .cyber-modal-body p {
+        font-size: 1.08rem;
+        color: #cbd5e1;
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+
+    .modal-highlight {
+        color: var(--cb-gold);
+        font-weight: 700;
+    }
+
+    .modal-green .modal-highlight {
+        color: var(--cb-green);
+    }
+
+    .cyber-modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .btn-modal-primary {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 11px 22px;
+        background: var(--cb-gold);
+        color: #05070a;
+        border: none;
+        cursor: pointer;
+        clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+        transition: 0.2s;
+    }
+
+    .modal-green .btn-modal-primary {
+        background: var(--cb-green);
+    }
+
+    .btn-modal-primary:hover {
+        filter: brightness(1.15);
+        transform: scale(1.03);
+    }
+
+    .btn-modal-cancel {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 11px 20px;
+        background: transparent;
+        color: #94a3b8;
+        border: 1px solid #475569;
+        cursor: pointer;
+        clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+        transition: 0.2s;
+    }
+
+    .btn-modal-cancel:hover {
+        color: #ffffff;
+        border-color: #ffffff;
+    }
+
+    @keyframes pulseWarn {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+
+    @keyframes fadeInModal {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes popScale {
+        to { transform: scale(1); }
+    }
+</style>
+
+<div class="container-fluid py-4 px-4 cyber-reminder-wrapper">
+
+    <!-- Header Judul -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 cyber-beacon-header">
+        <div>
+            <span class="cyber-tag">// TELETRAAN-1 TRANSMISSION BEACON</span>
+            <h2>Reminder Follow-up</h2>
+            <p>Pantau jadwal komunikasi dan sinyal tindak lanjut seluruh customer.</p>
+        </div>
+
+        <!-- Tombol Pemicu Manual Pop-up Radar -->
+        <button type="button" class="btn-modal-primary" onclick="openRadarPopup()">
+            📡 Cek Radar Peringatan
+        </button>
+    </div>
+
+    <!-- Pesan Alert Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="cyber-alert-msg">✔ [TRANSMISSION CONFIRMED]: {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- 3 Kartu Statistik Reminder -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="cyber-stat-card stat-cyan">
+                <div class="stat-code">◈ TOTAL REMINDER AKTIF</div>
+                <h3 class="stat-number">{{ reminders.count }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="cyber-stat-card stat-gold">
+                <div class="stat-code">⏱ JADWAL HARI INI</div>
+                <h3 class="stat-number">{{ hari_ini.count }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="cyber-stat-card stat-red">
+                <div class="stat-code">⚠ TERLAMBAT / OVERDUE</div>
+                <h3 class="stat-number">{{ terlambat.count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabel Daftar Pengingat -->
+    <div class="cyber-table-card">
+        <div class="cyber-card-topbar">
+            <h5>Daftar Pengingat</h5>
+            <span>[ACTIVE SIGNALS: {{ reminders.count }}]</span>
+        </div>
+
+        <div class="p-0">
+            <div class="table-responsive">
+                <table class="cyber-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Reminder</th>
+                            <th>Jadwal</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in reminders %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'prospek:detail' item.prospek.id %}" class="cyber-customer-link">
+                                    ▸ {{ item.prospek.nama }}
+                                </a>
+                            </td>
+
+                            <td style="font-weight: 600; color: #ffffff;">{{ item.judul }}</td>
+
+                            <td class="cyber-mono">{{ item.tanggal|date:"d-m-Y H:i" }}</td>
+
+                            <td>
+                                {% if item.terlambat %}
+                                    <span class="cyber-badge badge-overdue">⚠ Terlambat</span>
+                                {% else %}
+                                    <span class="cyber-badge badge-pending">⏳ Menunggu</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <form method="POST"
+                                      id="form-reminder-{{ item.id }}"
+                                      action="{% url 'prospek:selesaikan_reminder' item.id %}">
+                                    {% csrf_token %}
+                                    <button type="button"
+                                            class="btn-cyber-complete"
+                                            onclick="confirmComplete('{{ item.id }}', '{{ item.prospek.nama|escapejs }}', '{{ item.judul|escapejs }}')">
+                                        ✔ Selesaikan
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center cyber-empty">
+                                [!] TIDAK ADA REMINDER AKTIF DI RADAR SAAT INI.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ================= POP-UP 1: RADAR ALERT OTOMATIS ================= -->
+<div class="cyber-modal-overlay" id="radarPopup">
+    <div class="cyber-modal-box">
+        <div class="cyber-modal-head">
+            <span>⚠ TELETRAAN-1 BEACON ALERT</span>
+            <span>[PRIORITY]</span>
+        </div>
+        <div class="cyber-modal-body">
+            <h4>Sinyal Follow-up Terdeteksi!</h4>
+            <p>
+                Commander, radar mendeteksi ada <span class="modal-highlight">{{ hari_ini.count }} jadwal hari ini</span> 
+                dan <span style="color: #ff4d6d; font-weight: 700;">{{ terlambat.count }} reminder terlambat</span> 
+                yang membutuhkan tindakan segera.
+            </p>
+            <div class="cyber-modal-actions">
+                <button type="button" class="btn-modal-primary" onclick="closeModal('radarPopup')">
+                    ⚡ Siap, Laksanakan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= POP-UP 2: KONFIRMASI SELESAIKAN REMINDER ================= -->
+<div class="cyber-modal-overlay" id="confirmCompletePopup">
+    <div class="cyber-modal-box modal-green">
+        <div class="cyber-modal-head">
+            <span>◈ MISSION COMPLETION PROTOCOL</span>
+            <span>[VERIFY]</span>
+        </div>
+        <div class="cyber-modal-body">
+            <h4>Selesaikan Reminder?</h4>
+            <p>
+                Konfirmasi bahwa tugas <span class="modal-highlight" id="popupTaskTitle">-</span> 
+                untuk customer <span class="modal-highlight" id="popupCustomerName">-</span> telah selesai dilakukan.
+            </p>
+            <div class="cyber-modal-actions">
+                <button type="button" class="btn-modal-primary" id="btnSubmitConfirm">
+                    ✔ Ya, Selesaikan
+                </button>
+                <button type="button" class="btn-modal-cancel" onclick="closeModal('confirmCompletePopup')">
+                    ✖ Batal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let targetFormId = null;
+
+    // Munculkan Pop-up Otomatis saat halaman dibuka jika ada jadwal hari ini atau terlambat
+    document.addEventListener("DOMContentLoaded", function() {
+        const overdueCount = parseInt("{{ terlambat.count|default:0 }}");
+        const todayCount = parseInt("{{ hari_ini.count|default:0 }}");
+
+        if (overdueCount > 0 || todayCount > 0) {
+            setTimeout(() => {
+                openRadarPopup();
+            }, 400);
+        }
+    });
+
+    function openRadarPopup() {
+        document.getElementById('radarPopup').classList.add('show');
+    }
+
+    function confirmComplete(id, customerName, taskTitle) {
+        targetFormId = 'form-reminder-' + id;
+        document.getElementById('popupCustomerName').textContent = customerName;
+        document.getElementById('popupTaskTitle').textContent = taskTitle;
+        document.getElementById('confirmCompletePopup').classList.add('show');
+    }
+
+    document.getElementById('btnSubmitConfirm').addEventListener('click', function() {
+        if (targetFormId) {
+            document.getElementById(targetFormId).submit();
+        }
+    });
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('show');
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBERTRON COMMAND OS // Django System</title>
+    <!-- Bootstrap 5 CSS agar layout grid & margin tetap rapi -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Futuristik Cybertron -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #05070a;
+            color: #f8fafc;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Navbar Utama Bergaya Cybertron */
+        .cyber-navbar {
+            background: linear-gradient(90deg, #0a0e17 0%, #131a29 50%, #0a0e17 100%);
+            border-bottom: 2px solid #ef233c;
+            box-shadow: 0 4px 25px rgba(239, 35, 60, 0.35);
+            padding: 14px 28px;
+        }
+
+        .cyber-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+            color: #ffffff !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cyber-brand span {
+            color: #00b4d8;
+            font-size: 0.85rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .cyber-nav-link {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #94a3b8 !important;
+            text-transform: uppercase;
+            padding: 8px 16px !important;
+            border: 1px solid transparent;
+            transition: all 0.25s ease;
+        }
+
+        .cyber-nav-link:hover {
+            color: #ffffff !important;
+            border-color: #00b4d8;
+            background: rgba(0, 180, 216, 0.12);
+            box-shadow: 0 0 12px rgba(0, 180, 216, 0.3);
+        }
+
+        .cyber-footer {
+            text-align: center;
+            padding: 18px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.78rem;
+            color: #64748b;
+            letter-spacing: 1.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigasi Atas -->
+    <nav class="navbar navbar-expand-lg cyber-navbar">
+        <div class="container-fluid">
+            <a class="cyber-brand" href="/">
+                ◈ CYBERTRON OS <span>// DJANGO v6.0</span>
+            </a>
+
+            <div class="d-flex gap-2">
+                <a class="nav-link cyber-nav-link" href="/">Dashboard</a>
+                <a class="nav-link cyber-nav-link" href="{% url 'prospek:index' %}">Data Prospek</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Area Konten Halaman Anak (Prospek, Form, Hapus, dll) -->
+    <main class="py-3">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="cyber-footer">
+        TELETRAAN-1 NETWORK // SYSTEM STATUS: ONLINE
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

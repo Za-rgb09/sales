@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+    /* Variabel Tema Cybertron Hub */
+    .cyber-hub-wrapper {
+        --cb-primary: #ef233c;      /* Autobot Red */
+        --cb-secondary: #00b4d8;    /* Energon Cyan */
+        --cb-gold: #ffb703;         /* Bumblebee Gold */
+        --cb-green: #00ffcc;        /* Matrix Green */
+        --cb-bg-dark: #070a10;
+        --cb-panel: #0e131f;
+        --cb-input-bg: #080b12;
+        --cb-row-hover: rgba(0, 180, 216, 0.12);
+        --cb-border: rgba(0, 180, 216, 0.28);
+        --cb-glow-red: rgba(239, 35, 60, 0.45);
+        --cb-glow-cyan: rgba(0, 180, 216, 0.35);
+        --cb-glow-gold: rgba(255, 183, 3, 0.4);
+        --cb-glow-green: rgba(0, 255, 204, 0.35);
+
+        background-color: var(--cb-bg-dark);
+        background-image: 
+            linear-gradient(rgba(0, 180, 216, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 180, 216, 0.04) 1px, transparent 1px);
+        background-size: 32px 32px;
+        color: #f1f5f9;
+        font-family: 'Rajdhani', sans-serif;
+        min-height: 85vh;
+        border-radius: 6px;
+        border: 1px solid var(--cb-border);
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85);
+    }
+
+    /* Header Utama */
+    .cyber-hub-header {
+        background: linear-gradient(90deg, rgba(14, 19, 31, 0.95), rgba(239, 35, 60, 0.14));
+        border-left: 5px solid var(--cb-primary);
+        border-bottom: 1px solid var(--cb-border);
+        padding: 20px 26px;
+        clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+    }
+
+    .cyber-tag {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--cb-secondary);
+        letter-spacing: 2px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .cyber-hub-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        font-size: 1.7rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0;
+        color: #ffffff;
+        text-shadow: 0 0 14px var(--cb-glow-red);
+    }
+
+    .cyber-hub-header p {
+        margin: 4px 0 0;
+        color: #94a3b8;
+        font-size: 1.05rem;
+    }
+
+    /* Tombol Aksi Atas */
+    .btn-cyber-top {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        padding: 11px 18px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        transition: all 0.25s ease;
+    }
+
+    .btn-top-gold {
+        background: rgba(255, 183, 3, 0.15);
+        color: var(--cb-gold) !important;
+        border: 1px solid var(--cb-gold);
+    }
+    .btn-top-gold:hover {
+        background: var(--cb-gold);
+        color: #070a10 !important;
+        box-shadow: 0 0 16px var(--cb-glow-gold);
+    }
+
+    .btn-top-green {
+        background: rgba(0, 255, 204, 0.12);
+        color: var(--cb-green) !important;
+        border: 1px solid var(--cb-green);
+    }
+    .btn-top-green:hover {
+        background: var(--cb-green);
+        color: #070a10 !important;
+        box-shadow: 0 0 16px var(--cb-glow-green);
+    }
+
+    .btn-top-red {
+        background: linear-gradient(135deg, var(--cb-primary), #9b111e);
+        color: #ffffff !important;
+        border: none;
+        box-shadow: 0 0 16px var(--cb-glow-red);
+    }
+    .btn-top-red:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 24px var(--cb-primary);
+        filter: brightness(1.15);
+    }
+
+    /* Alert Messages Django */
+    .cyber-alert-msg {
+        background: rgba(0, 255, 204, 0.1);
+        border: 1px solid var(--cb-green);
+        border-left: 4px solid var(--cb-green);
+        color: var(--cb-green);
+        font-family: 'Share Tech Mono', monospace;
+        padding: 12px 20px;
+        margin-bottom: 24px;
+        letter-spacing: 1px;
+        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+
+    /* Panel Filter & Pencarian Radar */
+    .cyber-filter-card {
+        background: var(--cb-panel);
+        border: 1px solid var(--cb-border);
+        border-left: 4px solid var(--cb-secondary);
+        padding: 20px 24px;
+        clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .cyber-input, .cyber-select {
+        background-color: var(--cb-input-bg) !important;
+        color: #f8fafc !important;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        padding: 11px 16px;
+        border: 1px solid rgba(0, 180, 216, 0.35) !important;
+        border-radius: 0 !important;
+        outline: none;
+        transition: 0.25s;
+    }
+
+    .cyber-input::placeholder {
+        color: #64748b;
+    }
+
+    .cyber-input:focus, .cyber-select:focus {
+        border-color: var(--cb-primary) !important;
+        box-shadow: 0 0 12px var(--cb-glow-red) !important;
+    }
+
+    .cyber-select option {
+        background-color: #0e131f;
+        color: #f8fafc;
+    }
+
+    .btn-cyber-filter {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--cb-secondary), #0077b6);
+        color: #05070a;
+        border: none;
+        cursor: pointer;
+        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        transition: 0.25s;
+    }
+
+    .btn-cyber-filter:hover {
+        filter: brightness(1.15);
+        box-shadow: 0 0 18px var(--cb-glow-cyan);
+    }
+
+    /* Kartu Tabel Data */
+    .cyber-table-card {
+        background: var(--cb-panel);
+        border: 1px solid var(--cb-border);
+        border-top: 3px solid var(--cb-secondary);
+        clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+    }
+
+    .cyber-card-topbar {
+        background: rgba(0, 180, 216, 0.08);
+        padding: 10px 22px;
+        border-bottom: 1px solid var(--cb-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--cb-secondary);
+        letter-spacing: 1.5px;
+    }
+
+    .cyber-table {
+        width: 100%;
+        margin-bottom: 0;
+        color: #e2e8f0;
+        border-collapse: collapse;
+    }
+
+    .cyber-table thead th {
+        background: rgba(5, 8, 15, 0.9);
+        color: var(--cb-secondary);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 16px 18px;
+        border-bottom: 2px solid var(--cb-primary);
+        white-space: nowrap;
+    }
+
+    .cyber-table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        transition: background 0.2s ease;
+    }
+
+    .cyber-table tbody tr:hover {
+        background: var(--cb-row-hover);
+    }
+
+    .cyber-table tbody td {
+        padding: 14px 18px;
+        font-size: 1.02rem;
+        vertical-align: middle;
+    }
+
+    .cyber-index {
+        font-family: 'Share Tech Mono', monospace;
+        color: var(--cb-secondary);
+        font-weight: bold;
+    }
+
+    .cyber-mono {
+        font-family: 'Share Tech Mono', monospace;
+        color: #cbd5e1;
+        font-size: 0.95rem;
+    }
+
+    /* Badge Status Dinamis */
+    .cyber-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.78rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+    }
+
+    .badge-deal {
+        background: rgba(0, 255, 204, 0.14);
+        color: var(--cb-green);
+        border: 1px solid var(--cb-green);
+    }
+
+    .badge-failed {
+        background: rgba(239, 35, 60, 0.18);
+        color: #ff4d6d;
+        border: 1px solid var(--cb-primary);
+    }
+
+    .badge-process {
+        background: rgba(0, 180, 216, 0.15);
+        color: var(--cb-secondary);
+        border: 1px solid var(--cb-secondary);
+    }
+
+    /* Tombol Aksi Tabel (Detail & Edit) */
+    .btn-row-detail, .btn-row-edit {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 7px 13px;
+        text-decoration: none;
+        display: inline-block;
+        clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+        transition: 0.2s;
+    }
+
+    .btn-row-detail {
+        background: rgba(0, 180, 216, 0.15);
+        color: var(--cb-secondary) !important;
+        border: 1px solid var(--cb-secondary);
+    }
+    .btn-row-detail:hover {
+        background: var(--cb-secondary);
+        color: #05070a !important;
+        box-shadow: 0 0 12px var(--cb-glow-cyan);
+    }
+
+    .btn-row-edit {
+        background: rgba(255, 183, 3, 0.15);
+        color: var(--cb-gold) !important;
+        border: 1px solid var(--cb-gold);
+    }
+    .btn-row-edit:hover {
+        background: var(--cb-gold);
+        color: #05070a !important;
+        box-shadow: 0 0 12px var(--cb-glow-gold);
+    }
+
+    .cyber-empty {
+        font-family: 'Share Tech Mono', monospace;
+        color: var(--cb-secondary);
+        letter-spacing: 1.5px;
+        padding: 40px 20px !important;
+        font-size: 1rem;
+    }
+</style>
+
+<div class="container-fluid py-4 px-4 cyber-hub-wrapper">
+
+    <!-- Header Judul & 3 Tombol Navigasi Utama -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3 cyber-hub-header">
+        <div>
+            <span class="cyber-tag">// TELETRAAN-1 PROSPECT COMMAND</span>
+            <h2>Manajemen Prospek</h2>
+            <p class="mb-0">
+                Kelola dan pantau perjalanan setiap customer dalam jaringan Cybertron.
+            </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'prospek:reminder' %}" class="btn-cyber-top btn-top-gold">
+                🔔 Reminder
+            </a>
+
+            <a href="{% url 'prospek:export_excel' %}" class="btn-cyber-top btn-top-green">
+                📊 Export Excel
+            </a>
+
+            <a href="{% url 'prospek:tambah' %}" class="btn-cyber-top btn-top-red">
+                ⚡ + Tambah Prospek
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Messages Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="cyber-alert-msg">✔ [SYSTEM NOTICE]: {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Panel Pencarian & Filter Status -->
+    <div class="cyber-filter-card mb-4">
+        <form method="GET" class="row g-2 align-items-center">
+
+            <div class="col-md-6">
+                <input type="text"
+                       name="q"
+                       value="{{ keyword }}"
+                       class="form-control cyber-input"
+                       placeholder="🔍 Cari nama, nomor HP, atau unit...">
+            </div>
+
+            <div class="col-md-4">
+                <select name="status" class="form-select cyber-select">
+                    <option value="">◈ Semua Status</option>
+
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}"
+                            {% if status_filter == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn-cyber-filter w-100">⚡ Filter</button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Tabel Daftar Prospek -->
+    <div class="cyber-table-card">
+        <div class="cyber-card-topbar">
+            <span>◈ DETECTED CUSTOMER UNITS</span>
+            <span>RECORDS FOUND: {{ data|length }}</span>
+        </div>
+
+        <div class="p-0">
+            <div class="table-responsive">
+                <table class="cyber-table align-middle">
+
+                    <thead>
+                        <tr>
+                            <th># No</th>
+                            <th>Nama Customer</th>
+                            <th>Nomor HP</th>
+                            <th>Unit Diminati</th>
+                            <th>Status</th>
+                            <th>Tanggal Masuk</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in data %}
+                        <tr>
+                            <td class="cyber-index">[0{{ forloop.counter }}]</td>
+                            <td style="font-weight: 700; color: #ffffff;">{{ item.nama }}</td>
+                            <td class="cyber-mono">{{ item.nomor_hp|default:"-" }}</td>
+                            <td style="color: var(--cb-gold); font-weight: 600;">{{ item.unit_diminati|default:"-" }}</td>
+
+                            <td>
+                                {% if item.status == 'Deal' or item.status == 'Diserahkan' %}
+                                    <span class="cyber-badge badge-deal">
+                                        ✔ {{ item.get_status_display }}
+                                    </span>
+                                {% elif item.status == 'Tidak Berhasil' %}
+                                    <span class="cyber-badge badge-failed">
+                                        ✖ {{ item.get_status_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="cyber-badge badge-process">
+                                        ◈ {{ item.get_status_display }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="cyber-mono">{{ item.created_at|date:"d-m-Y" }}</td>
+
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'prospek:detail' item.id %}"
+                                       class="btn-row-detail">
+                                        Detail
+                                    </a>
+
+                                    <a href="{% url 'prospek:edit' item.id %}"
+                                       class="btn-row-edit">
+                                        Edit
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center cyber-empty">
+                                [!] BELUM ADA DATA PROSPEK TERDETEKSI DI RADAR.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

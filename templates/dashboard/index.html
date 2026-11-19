@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybertron Command Center // Django OS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Mode Autobot (Default) */
+            --primary: #ff2a2a;
+            --secondary: #00a8ff;
+            --accent: #ffcc00;
+            --glow: rgba(255, 42, 42, 0.55);
+            --glow-sec: rgba(0, 168, 255, 0.4);
+            --bg-void: #05070a;
+            --armor-dark: #0e121a;
+            --armor-light: #18202c;
+            --text-main: #f8fafc;
+            --text-dim: #7f8ea3;
+        }
+
+        /* Mode Decepticon */
+        body.decepticon-mode {
+            --primary: #a855f7;
+            --secondary: #ec4899;
+            --accent: #38bdf8;
+            --glow: rgba(168, 85, 247, 0.6);
+            --glow-sec: rgba(236, 72, 153, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Latar Belakang Grid & Radar */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -2;
+        }
+
+        .bg-radar {
+            position: fixed;
+            width: 750px;
+            height: 750px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 0 80px var(--glow-sec);
+            animation: spinSlow 40s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Bingkai Luar (Armor Frame) */
+        .hud-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 820px;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--primary), transparent 40%, transparent 60%, var(--secondary));
+            clip-path: polygon(
+                35px 0, calc(100% - 35px) 0, 100% 35px,
+                100% calc(100% - 35px), calc(100% - 35px) 100%, 35px 100%,
+                0 calc(100% - 35px), 0 35px
+            );
+            box-shadow: 0 0 40px var(--glow);
+            transition: all 0.5s ease;
+        }
+
+        /* Panel Dalam */
+        .hud-panel {
+            position: relative;
+            background: radial-gradient(circle at top, var(--armor-light) 0%, var(--armor-dark) 75%);
+            padding: 40px 45px;
+            clip-path: polygon(
+                33px 0, calc(100% - 33px) 0, 100% 33px,
+                100% calc(100% - 33px), calc(100% - 33px) 100%, 33px 100%,
+                0 calc(100% - 33px), 0 33px
+            );
+            overflow: hidden;
+        }
+
+        /* Garis Laser Pemindai (Scanning Beam) */
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), #ffffff, var(--primary), transparent);
+            box-shadow: 0 0 15px var(--primary);
+            opacity: 0.7;
+            animation: scanMove 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* Header HUD */
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding-bottom: 18px;
+            margin-bottom: 30px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+        }
+
+        .sys-code {
+            color: var(--text-dim);
+        }
+
+        .sys-code span {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 5px 12px;
+            border-radius: 3px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: blink 1.2s infinite;
+        }
+
+        /* Emblem Faksi di Tengah */
+        .emblem-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .emblem-svg {
+            width: 78px;
+            height: 78px;
+            fill: var(--primary);
+            filter: drop-shadow(0 0 14px var(--glow));
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.4s ease;
+        }
+
+        .faction-title {
+            margin-top: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        /* Judul Utama */
+        .main-title {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 30%, var(--text-dim) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle-box {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.04);
+            border-left: 3px solid var(--primary);
+            border-right: 3px solid var(--secondary);
+            padding: 10px 24px;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            color: #e2e8f0;
+        }
+
+        /* Grid Kartu Status Cybertron */
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 2px solid var(--secondary);
+            padding: 16px;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+            transition: transform 0.25s ease, border-color 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-top-color: var(--primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .stat-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .stat-bar {
+            height: 4px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            width: 92%;
+        }
+
+        /* Area Tombol Aksi */
+        .action-area {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Tombol Link Fitur Utama (Manajemen Prospek) */
+        .btn-cyber {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 15px 30px;
+            border: none;
+            cursor: pointer;
+            color: #ffffff;
+            background: linear-gradient(90deg, var(--primary), #990000);
+            clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+            box-shadow: 0 0 20px var(--glow);
+            transition: all 0.3s ease;
+        }
+
+        .btn-cyber:hover {
+            transform: scale(1.04);
+            filter: brightness(1.2);
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 15px 26px;
+            background: transparent;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            cursor: pointer;
+            clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 168, 255, 0.15);
+            box-shadow: 0 0 15px var(--glow-sec);
+        }
+
+        /* Footer Teknis */
+        .hud-footer {
+            margin-top: 32px;
+            padding-top: 14px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Animasi */
+        @keyframes scanMove {
+            0%, 100% { top: 0%; opacity: 0.2; }
+            50% { top: 98%; opacity: 0.85; }
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 650px) {
+            .telemetry-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.75rem; }
+            .hud-panel { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+    <div class="bg-radar"></div>
+
+    <div class="hud-wrapper">
+        <div class="hud-panel" id="hudPanel">
+            <div class="scanline"></div>
+
+            <!-- Baris Atas -->
+            <div class="hud-header">
+                <div class="sys-code">SYS.OS // <span>DJANGO-CORE v6</span></div>
+                <div class="live-indicator">
+                    <span class="pulse-dot"></span>
+                    ENERGON LINK: ACTIVE
+                </div>
+            </div>
+
+            <!-- Logo Faksi -->
+            <div class="emblem-box">
+                <svg class="emblem-svg" id="factionIcon" viewBox="0 0 100 100">
+                    <polygon points="15,10 85,10 92,45 75,90 50,80 25,90 8,45" fill="none" stroke="currentColor" stroke-width="4"/>
+                    <polygon points="24,20 44,28 44,45 22,40"/>
+                    <polygon points="76,20 56,28 56,45 78,40"/>
+                    <polygon points="30,52 46,56 46,76 32,70"/>
+                    <polygon points="70,52 54,56 54,76 68,70"/>
+                    <polygon points="46,18 54,18 52,48 48,48"/>
+                </svg>
+                <div class="faction-title" id="factionName">AUTOBOT COMMAND PROTOCOL</div>
+            </div>
+
+            <!-- Judul & Pesan Django -->
+            <div class="main-title">
+                <h1>Welcome to Dashboard</h1>
+                <div class="subtitle-box">
+                    Project Django berhasil dibuat! Seluruh modul siap beroperasi.
+                </div>
+            </div>
+
+            <!-- Kartu Status Sistem -->
+            <div class="telemetry-grid">
+                <div class="stat-card">
+                    <div class="stat-label">ENERGON OUTPUT</div>
+                    <div class="stat-value" id="energonVal">98.4%</div>
+                    <div class="stat-bar"><div class="stat-fill" style="width: 98%;"></div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">DJANGO ENGINE</div>
+                    <div class="stat-value">ONLINE</div>
+                    <div class="stat-bar"><div class="stat-fill" style="width: 100%;"></div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">SECURITY SHIELD</div>
+                    <div class="stat-value" id="shieldVal">OPTIMAL</div>
+                    <div class="stat-bar"><div class="stat-fill" style="width: 89%;"></div></div>
+                </div>
+            </div>
+
+            <!-- Tombol Kontrol -->
+            <div class="action-area">
+                <!-- Tombol Link ke Fitur Utama Manajemen Prospek -->
+                <a href="{% url 'prospek:index' %}" class="btn-cyber">
+                    ⚡ Manajemen Prospek
+                </a>
+
+                <button class="btn-secondary" onclick="runDiagnostic()">
+                    ◈ Run Scan
+                </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="hud-footer">
+                <span>SECTOR: CYBERTRON-01</span>
+                <span id="diagStatus">STATUS: ALL SYSTEMS NOMINAL</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function runDiagnostic() {
+            const diag = document.getElementById('diagStatus');
+            const energon = document.getElementById('energonVal');
+            diag.textContent = 'SCANNING DJANGO MODULES...';
+            
+            let count = 0;
+            const interval = setInterval(() => {
+                energon.textContent = (90 + Math.random() * 9.9).toFixed(1) + '%';
+                count++;
+                if (count > 10) {
+                    clearInterval(interval);
+                    energon.textContent = '99.2%';
+                    diag.textContent = 'SCAN COMPLETE: 0 THREATS DETECTED';
+                }
+            }, 80);
+        }
+    </script>
+
+</body>
+</html>

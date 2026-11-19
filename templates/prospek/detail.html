@@ -1,0 +1,546 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+    /* Variabel Tema Cybertron Dossier */
+    .cyber-detail-wrapper {
+        --cb-primary: #ef233c;      /* Autobot Red */
+        --cb-secondary: #00b4d8;    /* Energon Cyan */
+        --cb-gold: #ffb703;         /* Bumblebee Gold */
+        --cb-green: #00ffcc;        /* Matrix Green */
+        --cb-bg-dark: #070a10;
+        --cb-panel: #0e131f;
+        --cb-input-bg: #080b12;
+        --cb-border: rgba(0, 180, 216, 0.28);
+        --cb-glow-red: rgba(239, 35, 60, 0.45);
+        --cb-glow-cyan: rgba(0, 180, 216, 0.35);
+        --cb-glow-gold: rgba(255, 183, 3, 0.4);
+
+        background-color: var(--cb-bg-dark);
+        background-image: 
+            linear-gradient(rgba(0, 180, 216, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 180, 216, 0.04) 1px, transparent 1px);
+        background-size: 32px 32px;
+        color: #f1f5f9;
+        font-family: 'Rajdhani', sans-serif;
+        min-height: 85vh;
+        border-radius: 6px;
+        border: 1px solid var(--cb-border);
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85);
+    }
+
+    /* Header Profil Target */
+    .cyber-dossier-header {
+        background: linear-gradient(90deg, rgba(14, 19, 31, 0.95), rgba(239, 35, 60, 0.14));
+        border-left: 5px solid var(--cb-primary);
+        border-bottom: 1px solid var(--cb-border);
+        padding: 22px 28px;
+        clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%);
+    }
+
+    .cyber-tag {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--cb-secondary);
+        letter-spacing: 2px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .cyber-dossier-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        font-size: 1.85rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0;
+        color: #ffffff;
+        text-shadow: 0 0 15px var(--cb-glow-red);
+    }
+
+    .cyber-dossier-header p {
+        margin: 4px 0 0;
+        color: #94a3b8;
+        font-size: 1.05rem;
+    }
+
+    /* Alert Notifikasi Django Messages */
+    .cyber-alert-msg {
+        background: rgba(0, 255, 204, 0.1);
+        border: 1px solid var(--cb-green);
+        border-left: 4px solid var(--cb-green);
+        color: var(--cb-green);
+        font-family: 'Share Tech Mono', monospace;
+        padding: 12px 20px;
+        margin-bottom: 24px;
+        letter-spacing: 1px;
+        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    }
+
+    /* Kartu Panel Cybertron */
+    .cyber-panel {
+        background: var(--cb-panel);
+        border: 1px solid var(--cb-border);
+        border-top: 3px solid var(--cb-secondary);
+        clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+    }
+
+    .cyber-panel.accent-red { border-top-color: var(--cb-primary); }
+    .cyber-panel.accent-gold { border-top-color: var(--cb-gold); }
+
+    .cyber-panel-head {
+        background: rgba(0, 180, 216, 0.08);
+        padding: 12px 22px;
+        border-bottom: 1px solid var(--cb-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cyber-panel-head h5 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.92rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin: 0;
+        color: #ffffff;
+    }
+
+    .cyber-panel-head span {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--cb-secondary);
+    }
+
+    .cyber-panel-body {
+        padding: 24px;
+    }
+
+    /* Baris Informasi Customer */
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 9px 0;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+        font-size: 1.02rem;
+    }
+
+    .info-row strong {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.85rem;
+        color: var(--cb-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .info-row span {
+        color: #f8fafc;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .cyber-notes-box {
+        margin-top: 16px;
+        background: rgba(0, 0, 0, 0.35);
+        border-left: 3px solid var(--cb-primary);
+        padding: 12px 16px;
+    }
+
+    .cyber-notes-box strong {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.8rem;
+        color: var(--cb-primary);
+        display: block;
+        margin-bottom: 4px;
+        letter-spacing: 1px;
+    }
+
+    /* Auto-Styling Input Form Follow-up & Reminder */
+    .cyber-field label {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--cb-secondary);
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .cyber-field input,
+    .cyber-field select,
+    .cyber-field textarea {
+        width: 100%;
+        background-color: var(--cb-input-bg) !important;
+        color: #f8fafc !important;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        padding: 10px 14px;
+        border: 1px solid rgba(0, 180, 216, 0.35) !important;
+        border-left: 3px solid var(--cb-secondary) !important;
+        border-radius: 0 !important;
+        outline: none;
+        transition: 0.25s;
+    }
+
+    .cyber-field input:focus,
+    .cyber-field select:focus,
+    .cyber-field textarea:focus {
+        border-color: var(--cb-primary) !important;
+        border-left-color: var(--cb-primary) !important;
+        box-shadow: 0 0 12px var(--cb-glow-red) !important;
+    }
+
+    /* Timeline Riwayat Follow-up */
+    .cyber-timeline-item {
+        position: relative;
+        background: rgba(8, 11, 18, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-left: 4px solid var(--cb-secondary);
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+        transition: 0.25s;
+    }
+
+    .cyber-timeline-item:hover {
+        border-left-color: var(--cb-primary);
+        background: rgba(0, 180, 216, 0.08);
+    }
+
+    .timeline-method {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.92rem;
+        font-weight: 800;
+        color: var(--cb-secondary);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .timeline-date {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.78rem;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
+    /* Item Jadwal Reminder */
+    .cyber-reminder-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        background: rgba(8, 11, 18, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 14px 18px;
+        margin-bottom: 12px;
+    }
+
+    .cyber-reminder-item strong {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.9rem;
+        color: #ffffff;
+        letter-spacing: 0.8px;
+    }
+
+    /* Badge Status Reminder */
+    .cyber-badge {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.76rem;
+        padding: 5px 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+        white-space: nowrap;
+    }
+
+    .badge-done {
+        background: rgba(0, 255, 204, 0.14);
+        color: var(--cb-green);
+        border: 1px solid var(--cb-green);
+    }
+
+    .badge-late {
+        background: rgba(239, 35, 60, 0.18);
+        color: #ff4d6d;
+        border: 1px solid var(--cb-primary);
+    }
+
+    .badge-wait {
+        background: rgba(255, 183, 3, 0.15);
+        color: var(--cb-gold);
+        border: 1px solid var(--cb-gold);
+    }
+
+    /* Tombol-Tombol Cybertron */
+    .btn-cyber-red, .btn-cyber-gold, .btn-cyber-outline {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 12px 22px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        transition: all 0.25s ease;
+    }
+
+    .btn-cyber-red {
+        background: linear-gradient(135deg, var(--cb-primary), #9b111e);
+        color: #ffffff !important;
+        box-shadow: 0 0 16px var(--cb-glow-red);
+    }
+
+    .btn-cyber-red:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 24px var(--cb-primary);
+        filter: brightness(1.15);
+    }
+
+    .btn-cyber-gold {
+        background: linear-gradient(135deg, var(--cb-gold), #d97706);
+        color: #070a10 !important;
+        box-shadow: 0 0 16px var(--cb-glow-gold);
+    }
+
+    .btn-cyber-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 24px var(--cb-gold);
+        filter: brightness(1.1);
+    }
+
+    .btn-cyber-outline {
+        background: rgba(0, 180, 216, 0.1);
+        color: var(--cb-secondary) !important;
+        border: 1px solid var(--cb-secondary);
+    }
+
+    .btn-cyber-outline:hover {
+        background: rgba(0, 180, 216, 0.25);
+        color: #ffffff !important;
+        box-shadow: 0 0 15px var(--cb-glow-cyan);
+    }
+
+    .cyber-empty-text {
+        font-family: 'Share Tech Mono', monospace;
+        color: #64748b;
+        font-size: 0.9rem;
+        padding: 12px 0;
+    }
+</style>
+
+<div class="container-fluid py-4 px-4 cyber-detail-wrapper">
+
+    <!-- Header Nama Prospek -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 cyber-dossier-header">
+        <div>
+            <span class="cyber-tag">// TELETRAAN-1 TARGET DOSSIER</span>
+            <h2>{{ prospek.nama }}</h2>
+            <p>Detail profil dan log perjalanan prospek customer</p>
+        </div>
+
+        <a href="{% url 'prospek:edit' prospek.id %}" class="btn-cyber-red">
+            ◈ Edit Prospek
+        </a>
+    </div>
+
+    <!-- Pesan Alert Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="cyber-alert-msg">✔ [SYSTEM NOTICE]: {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+
+        <!-- KOLOM KIRI: Info Customer, Form Follow-up, Form Reminder -->
+        <div class="col-lg-5">
+
+            <!-- Kartu Informasi Customer -->
+            <div class="cyber-panel mb-4">
+                <div class="cyber-panel-head">
+                    <h5>Informasi Customer</h5>
+                    <span>[BIO-SCAN]</span>
+                </div>
+                <div class="cyber-panel-body">
+                    <div class="info-row">
+                        <strong>Nama</strong>
+                        <span>{{ prospek.nama }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Perusahaan</strong>
+                        <span>{{ prospek.perusahaan|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Nomor HP</strong>
+                        <span style="font-family: 'Share Tech Mono', monospace;">{{ prospek.nomor_hp|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Email</strong>
+                        <span>{{ prospek.email|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Sumber</strong>
+                        <span>{{ prospek.sumber|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Unit Diminati</strong>
+                        <span style="color: var(--cb-gold);">{{ prospek.unit_diminati|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Status</strong>
+                        <span style="color: var(--cb-green);">{{ prospek.get_status_display }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Tanggal Deal</strong>
+                        <span style="font-family: 'Share Tech Mono', monospace;">{{ prospek.tanggal_deal|date:"d-m-Y"|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Penyerahan Unit</strong>
+                        <span style="font-family: 'Share Tech Mono', monospace;">{{ prospek.tanggal_penyerahan|date:"d-m-Y"|default:"-" }}</span>
+                    </div>
+
+                    <div class="cyber-notes-box">
+                        <strong>// CATATAN TAMBAHAN:</strong>
+                        <p class="mb-0 text-light">{{ prospek.catatan|default:"Belum ada catatan." }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kartu Tambah Follow-up -->
+            <div class="cyber-panel accent-red mb-4">
+                <div class="cyber-panel-head">
+                    <h5>Tambah Follow-up</h5>
+                    <span>[TRANSMIT]</span>
+                </div>
+                <div class="cyber-panel-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="jenis" value="followup">
+
+                        {% for field in followup_form %}
+                            <div class="mb-3 cyber-field">
+                                <label>▸ {{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1" style="font-family: 'Share Tech Mono', monospace;">[!] {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <button class="btn-cyber-red w-100 mt-2">
+                            ⚡ Simpan Follow-up
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Kartu Buat Reminder -->
+            <div class="cyber-panel accent-gold">
+                <div class="cyber-panel-head">
+                    <h5>Buat Reminder</h5>
+                    <span>[BEACON]</span>
+                </div>
+                <div class="cyber-panel-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="jenis" value="reminder">
+
+                        {% for field in reminder_form %}
+                            <div class="mb-3 cyber-field">
+                                <label>▸ {{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1" style="font-family: 'Share Tech Mono', monospace;">[!] {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <button class="btn-cyber-gold w-100 mt-2">
+                            🔔 Simpan Reminder
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- KOLOM KANAN: Riwayat Follow-up & Jadwal Reminder -->
+        <div class="col-lg-7">
+
+            <!-- Kartu Riwayat Follow-up -->
+            <div class="cyber-panel mb-4">
+                <div class="cyber-panel-head">
+                    <h5>Riwayat Follow-up</h5>
+                    <span>[LOG ARCHIVE]</span>
+                </div>
+                <div class="cyber-panel-body">
+                    {% for item in riwayat %}
+                        <div class="cyber-timeline-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="timeline-method">◈ {{ item.metode }}</span>
+                                <span class="timeline-date">{{ item.tanggal|date:"d M Y, H:i" }}</span>
+                            </div>
+                            <p class="mt-2 mb-1 text-light" style="font-size: 1.05rem;">{{ item.hasil }}</p>
+                            {% if item.catatan %}
+                                <small style="color: #94a3b8; font-family: 'Share Tech Mono', monospace;">// {{ item.catatan }}</small>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p class="cyber-empty-text">[!] BELUM ADA RIWAYAT FOLLOW-UP TERCATAT.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Kartu Jadwal Reminder -->
+            <div class="cyber-panel accent-gold">
+                <div class="cyber-panel-head">
+                    <h5>Jadwal Reminder</h5>
+                    <span>[ACTIVE ALERTS]</span>
+                </div>
+                <div class="cyber-panel-body">
+                    {% for reminder in reminders %}
+                        <div class="cyber-reminder-item">
+                            <div>
+                                <strong>{{ reminder.judul }}</strong>
+                                <div class="timeline-date mt-1">
+                                    ⏱ {{ reminder.tanggal|date:"d M Y, H:i" }}
+                                </div>
+                                {% if reminder.catatan %}
+                                    <small class="text-light d-block mt-1">{{ reminder.catatan }}</small>
+                                {% endif %}
+                            </div>
+
+                            {% if reminder.selesai %}
+                                <span class="cyber-badge badge-done">✔ Selesai</span>
+                            {% elif reminder.terlambat %}
+                                <span class="cyber-badge badge-late">⚠ Terlambat</span>
+                            {% else %}
+                                <span class="cyber-badge badge-wait">⏳ Menunggu</span>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p class="cyber-empty-text">[!] BELUM ADA JADWAL REMINDER AKTIF.</p>
+                    {% endfor %}
+
+                    <a href="{% url 'prospek:reminder' %}" class="btn-cyber-outline mt-3">
+                        ◈ Lihat Semua Reminder
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
